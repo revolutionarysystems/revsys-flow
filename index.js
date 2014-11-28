@@ -1,0 +1,1 @@
+module.exports = require('./src/revsys-flow-maven');

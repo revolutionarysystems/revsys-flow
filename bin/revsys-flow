@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+
+"use strict";
+var path = require('path');
+var fs = require('fs');
+var src = path.join(path.dirname(fs.realpathSync(__filename)), '../src');
+
+var args = process.argv.slice(2);
+var type = args.shift();
+var method = args.shift();
+var params = [];
+var options = {};
+var flags = [];
+for(var i in args){
+	var arg = args[i];
+	if(arg.indexOf("--") > -1){
+		arg = arg.substring(2);
+		if(arg.indexOf("=") > -1){
+			var name = arg.substring(0, arg.indexOf("="));
+			var value = arg.substring(arg.indexOf("=")+1);
+			options[name] = value;
+		}else{
+			flags.push(arg);
+		}
+	}else{
+		params.push(arg);
+	}
+}
+
+require(src+'/revsys-flow-' + type + '.js').flow.run(method, params, options, flags);
