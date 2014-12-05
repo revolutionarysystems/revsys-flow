@@ -39,7 +39,7 @@ exports.flow = new function() {
 		var releaseName = "release-" + version;
 		async.series([
 				function(callback) {
-					flowutils.createReleaseBranch(options.url, releaseName, callback);
+					flowutils.createReleaseBranch(releaseName, options, callback);
 				},
 				function(callback) {
 					fs.readFile("pom.xml", "UTF-8", function(err, content) {

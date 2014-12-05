@@ -37,14 +37,20 @@ exports.flowutils = new function() {
 
 	this.execute = execute;
 
-	this.createReleaseBranch = function(gitUrl, releaseName, callback) {
+	this.createReleaseBranch = function(releaseName, options, callback) {
+		var gitUrl = options.url;
+		var branch = options.branch || "master";
 		var f = function(url, callback) {
 			_log.info("Git URL: " + url);
+			_log.info("Branch: " + branch);
 			_log.info("Creating release branch")
 			process.chdir("..");
-			execute("git clone " + gitUrl + " " + releaseName, function(err) {
-				if (err) {
-					callback(err);
+			var cmd = spawn("git", ["clone", "-b", branch, gitUrl, releaseName], {
+				stdio: 'inherit'
+			});
+			cmd.on('close', function(code) {
+				if (code > 0) {
+					callback("Cloning the git repository failed");
 				} else {
 					process.chdir(releaseName);
 					execute("git checkout -b " + releaseName, callback);
@@ -61,7 +67,7 @@ exports.flowutils = new function() {
 					f(gitUrl, callback);
 				}
 			})
-		}else{
+		} else {
 			f(gitUrl, callback);
 		}
 	}
@@ -86,7 +92,7 @@ exports.flowutils = new function() {
 				},
 				function(callback) {
 					_log.info("Pushing to git");
-					cmd = spawn("git", ["push"], {
+					var cmd = spawn("git", ["push", "origin", releaseName], {
 						stdio: 'inherit'
 					});
 					cmd.on('close', function(code) {

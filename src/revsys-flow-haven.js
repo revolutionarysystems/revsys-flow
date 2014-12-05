@@ -40,15 +40,7 @@ exports.flow = new function() {
 		var releaseName = "release-" + version;
 		async.series([
 				function(callback) {
-					flowutils.createReleaseBranch(options.url, releaseName, callback);
-				},
-				function(callback) {
-					try {
-						haven.checkConfig();
-						callback();
-					} catch (err) {
-						callback(e);
-					}
+					flowutils.createReleaseBranch(releaseName, options, callback);
 				},
 				function(callback) {
 					_log.info("Setting version to " + version);
@@ -56,7 +48,16 @@ exports.flow = new function() {
 						haven.setVersion(version);
 						callback();
 					} catch (err) {
-						callback(e);
+						callback(err);
+					}
+				},
+				function(callback) {
+					_log.info("Checking dependencies");
+					try {
+						haven.checkConfig();
+						callback();
+					} catch (err) {
+						callback(err);
 					}
 				},
 				function(callback) {
